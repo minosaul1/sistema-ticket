@@ -14,53 +14,18 @@ export default function TicketsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
-  // Datos simulados - en producción vendrían de la base de datos
-  const tickets = [
-    {
-      id: 1,
-      equipo: "PC-001",
-      usuario: "Juan Pérez",
-      tecnico: "Ana Martínez",
-      tipo: "Mantenimiento Preventivo",
-      estatus: "Abierto",
-      fecha_reporte: "2024-01-15",
-      fecha_inicio: "2024-01-15",
-      observaciones: "Limpieza general y actualización de software",
-    },
-    {
-      id: 2,
-      equipo: "LAP-005",
-      usuario: "María García",
-      tecnico: "Carlos Ruiz",
-      tipo: "Reparación",
-      estatus: "En Proceso",
-      fecha_reporte: "2024-01-14",
-      fecha_inicio: "2024-01-14",
-      observaciones: "Pantalla con líneas verticales",
-    },
-    {
-      id: 3,
-      equipo: "PC-012",
-      usuario: "Carlos López ferras",
-      tecnico: "Ana Martínez",
-      tipo: "Instalación Software",
-      estatus: "Resuelto",
-      fecha_reporte: "2024-01-13",
-      fecha_inicio: "2024-01-13",
-      observaciones: "Instalación de Office 365",
-    },
-    {
-      id: 4,
-      equipo: "LAP-008",
-      usuario: "Laura Sánchez",
-      tecnico: null,
-      tipo: "Soporte Técnico",
-      estatus: "Cerrado",
-      fecha_reporte: "2024-01-12",
-      fecha_inicio: "2024-01-12",
-      observaciones: "Problemas de conectividad WiFi",
-    },
-  ]
+  // Array vacío para llenar con datos reales en producción
+  const tickets: Array<{
+    id: number
+    equipo: string
+    usuario: string
+    tecnico: string | null
+    tipo: string
+    estatus: string
+    fecha_reporte: string
+    fecha_inicio: string
+    observaciones: string
+  }> = []
 
   const getStatusColor = (status: string) => {
     switch (status) {

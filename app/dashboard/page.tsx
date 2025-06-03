@@ -5,42 +5,24 @@ import { Ticket, Monitor, Users, Wrench, TrendingUp, Clock, CheckCircle, AlertCi
 import Link from "next/link"
 
 export default function DashboardPage() {
-  // Datos simulados - en producción vendrían de la base de datos
+  // Variables vacías para que las llenes dinámicamente
   const stats = {
-    totalTickets: 156,
-    ticketsAbiertos: 23,
-    ticketsEnProceso: 12,
-    ticketsResueltos: 121,
-    equiposTotal: 89,
-    usuariosActivos: 45,
+    totalTickets: 0,
+    ticketsAbiertos: 0,
+    ticketsEnProceso: 0,
+    ticketsResueltos: 0,
+    equiposTotal: 0,
+    usuariosActivos: 0,
   }
 
-  const recentTickets = [
-    {
-      id: 1,
-      equipo: "PC-001",
-      usuario: "Juan Pérez",
-      tipo: "Mantenimiento Preventivo",
-      estatus: "Abierto",
-      fecha: "2024-01-15",
-    },
-    {
-      id: 2,
-      equipo: "LAP-005",
-      usuario: "María García",
-      tipo: "Reparación",
-      estatus: "En Proceso",
-      fecha: "2024-01-14",
-    },
-    {
-      id: 3,
-      equipo: "PC-012",
-      usuario: "Carlos López",
-      tipo: "Instalación Software",
-      estatus: "Resuelto",
-      fecha: "2024-01-13",
-    },
-  ]
+  const recentTickets: Array<{
+    id: number
+    equipo: string
+    usuario: string
+    tipo: string
+    estatus: string
+    fecha: string
+  }> = []
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -66,7 +48,7 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
             </div>
             <nav className="flex space-x-4">
-            <Link href="/dashboard">
+              <Link href="/dashboard">
                 <Button variant="ghost">Dashboard</Button>
               </Link>
               <Link href="/tickets">
@@ -169,38 +151,6 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Quick Actions */}
-          {/*<Card>
-            <CardHeader>
-              <CardTitle>Acciones Rápidas</CardTitle>
-              <CardDescription>Accesos directos a funciones principales</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Link href="/tickets/nuevo">
-                <Button className="w-full justify-start">
-                  <Ticket className="h-4 w-4 mr-2" />
-                  Nuevo Ticket
-                </Button>
-              </Link>
-              <Link href="/equipos">
-                <Button variant="outline" className="w-full justify-start">
-                  <Monitor className="h-4 w-4 mr-2" />
-                  Gestionar Equipos
-                </Button>
-              </Link>
-              <Link href="/usuarios">
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="h-4 w-4 mr-2" />
-                  Administrar Usuarios
-                </Button>
-              </Link>
-              <Button variant="outline" className="w-full justify-start">
-                <Wrench className="h-4 w-4 mr-2" />
-                Mantenimiento
-              </Button>
-            </CardContent>
-          </Card>*/}
         </div>
       </main>
     </div>

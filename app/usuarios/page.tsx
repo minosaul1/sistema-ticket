@@ -14,72 +14,16 @@ export default function UsuariosPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [rolFilter, setRolFilter] = useState("all")
 
-  // Datos simulados - en producción vendrían de la base de datos
-  const usuarios = [
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      correo: "juan.perez@empresa.com",
-      telefono: "+52 555 123 4567",
-      rol: "Usuario",
-      equipos_asignados: 1,
-      tickets_activos: 2,
-    },
-    {
-      id: 2,
-      nombre: "María García",
-      correo: "maria.garcia@empresa.com",
-      telefono: "+52 555 234 5678",
-      rol: "Usuario",
-      equipos_asignados: 1,
-      tickets_activos: 1,
-    },
-    {
-      id: 3,
-      nombre: "Carlos López",
-      correo: "carlos.lopez@empresa.com",
-      telefono: "+52 555 345 6789",
-      rol: "Usuario",
-      equipos_asignados: 1,
-      tickets_activos: 0,
-    },
-    {
-      id: 4,
-      nombre: "Laura Sánchez",
-      correo: "laura.sanchez@empresa.com",
-      telefono: "+52 555 456 7890",
-      rol: "Usuario",
-      equipos_asignados: 1,
-      tickets_activos: 1,
-    },
-    {
-      id: 5,
-      nombre: "Ana Martínez",
-      correo: "ana.martinez@empresa.com",
-      telefono: "+52 555 567 8901",
-      rol: "Técnico",
-      equipos_asignados: 0,
-      tickets_activos: 5,
-    },
-    {
-      id: 6,
-      nombre: "Carlos Ruiz",
-      correo: "carlos.ruiz@empresa.com",
-      telefono: "+52 555 678 9012",
-      rol: "Técnico",
-      equipos_asignados: 0,
-      tickets_activos: 3,
-    },
-    {
-      id: 7,
-      nombre: "Pedro González",
-      correo: "pedro.gonzalez@empresa.com",
-      telefono: "+52 555 789 0123",
-      rol: "Admin",
-      equipos_asignados: 0,
-      tickets_activos: 0,
-    },
-  ]
+  // Array vacío para llenar con datos reales
+  const usuarios: Array<{
+    id: number
+    nombre: string
+    correo: string
+    telefono: string
+    rol: string
+    equipos_asignados: number
+    tickets_activos: number
+  }> = []
 
   const getRolColor = (rol: string) => {
     switch (rol) {
@@ -209,7 +153,9 @@ export default function UsuariosPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       <span
-                        className={`text-sm font-medium ${usuario.tickets_activos > 0 ? "text-orange-600" : "text-gray-500"}`}
+                        className={`text-sm font-medium ${
+                          usuario.tickets_activos > 0 ? "text-orange-600" : "text-gray-500"
+                        }`}
                       >
                         {usuario.tickets_activos}
                       </span>

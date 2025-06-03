@@ -14,69 +14,22 @@ export default function EquiposPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [tipoFilter, setTipoFilter] = useState("all")
 
-  // Datos simulados - en producción vendrían de la base de datos
-  const equipos = [
-    {
-      id: 1,
-      nom_equipo: "PC-001",
-      marca: "Dell",
-      modelo: "OptiPlex 7090",
-      tipo_equipo: "Desktop",
-      ram: "16GB",
-      disco: "SSD",
-      capacidad: "512GB",
-      procesador: "Intel Core i7-11700",
-      n_serie: "DL2024001",
-      mac: "00:1B:44:11:3A:B7",
-      ubicacion: "Oficina 101",
-      usuario: "Juan Pérez",
-    },
-    {
-      id: 2,
-      nom_equipo: "LAP-005",
-      marca: "HP",
-      modelo: "EliteBook 840",
-      tipo_equipo: "Laptop",
-      ram: "8GB",
-      disco: "SSD",
-      capacidad: "256GB",
-      procesador: "Intel Core i5-1135G7",
-      n_serie: "HP2024005",
-      mac: "00:1B:44:11:3A:C8",
-      ubicacion: "Sala de Juntas",
-      usuario: "María García",
-    },
-    {
-      id: 3,
-      nom_equipo: "PC-012",
-      marca: "Lenovo",
-      modelo: "ThinkCentre M720",
-      tipo_equipo: "Desktop",
-      ram: "8GB",
-      disco: "HDD",
-      capacidad: "1TB",
-      procesador: "Intel Core i5-9400",
-      n_serie: "LN2024012",
-      mac: "00:1B:44:11:3A:D9",
-      ubicacion: "Recepción",
-      usuario: "Carlos López",
-    },
-    {
-      id: 4,
-      nom_equipo: "LAP-008",
-      marca: "ASUS",
-      modelo: "VivoBook 15",
-      tipo_equipo: "Laptop",
-      ram: "12GB",
-      disco: "SSD",
-      capacidad: "512GB",
-      procesador: "AMD Ryzen 5 5500U",
-      n_serie: "AS2024008",
-      mac: "00:1B:44:11:3A:EA",
-      ubicacion: "Oficina 205",
-      usuario: "Laura Sánchez",
-    },
-  ]
+  // Array vacío para llenar con datos reales
+  const equipos: Array<{
+    id: number
+    nom_equipo: string
+    marca: string
+    modelo: string
+    tipo_equipo: string
+    ram: string
+    disco: string
+    capacidad: string
+    procesador: string
+    n_serie: string
+    mac: string
+    ubicacion: string
+    usuario: string
+  }> = []
 
   const getTipoColor = (tipo: string) => {
     switch (tipo) {
