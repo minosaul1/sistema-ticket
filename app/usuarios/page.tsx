@@ -99,10 +99,12 @@ export default function UsuariosPage() {
                 <SelectItem value="Usuario">Usuario</SelectItem>
               </SelectContent>
             </Select>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Usuario
-            </Button>
+            <Link href="/usuarios/nuevo">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nuevo Usuario
+              </Button>
+            </Link>
           </div>
         </div>
 

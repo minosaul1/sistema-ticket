@@ -167,7 +167,7 @@ export default function NuevoTicketPage() {
               </div>
 
               {/* Especificaciones */}
-              <div className="space-y-2">
+              {/*<div className="space-y-2">
                 <Label htmlFor="observaciones">Especificaciones *</Label>
                 <Textarea
                   id="observaciones"
@@ -177,10 +177,10 @@ export default function NuevoTicketPage() {
                   rows={4}
                   required
                 />
-              </div>
+              </div> */}
 
               {/* Observaciones */}
-              <div className="space-y-2">
+              {/*<div className="space-y-2">
                 <Label htmlFor="observaciones">Observaciones *</Label>
                 <Textarea
                   id="observaciones"
@@ -190,11 +190,11 @@ export default function NuevoTicketPage() {
                   rows={4}
                   required
                 />
-              </div>
+              </div> */}
 
               {/* Comentarios */}
               <div className="space-y-2">
-                <Label htmlFor="comentarios">Comentarios Adicionales</Label>
+                <Label htmlFor="comentarios">Comentarios </Label>
                 <Textarea
                   id="comentarios"
                   placeholder="Información adicional o comentarios..."
