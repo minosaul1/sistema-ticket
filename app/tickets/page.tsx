@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Ticket, Plus, Search, Filter, Eye } from "lucide-react"
+import { LogoutButton } from "@/components/LogoutButton" // Importar el botón de cierre de sesión
 
 export default function TicketsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -74,6 +75,7 @@ export default function TicketsPage() {
               <Link href="/usuarios">
                 <Button variant="ghost">Usuarios</Button>
               </Link>
+              <LogoutButton />
             </nav>
           </div>
         </div>

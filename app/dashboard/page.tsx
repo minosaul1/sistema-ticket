@@ -1,29 +1,58 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Ticket, Monitor, Users, Wrench, TrendingUp, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { Ticket, TrendingUp, AlertCircle, Clock, CheckCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { LogoutButton } from "@/components/LogoutButton" // Importar el botón de cierre de sesión
 
 export default function DashboardPage() {
-  // Variables vacías para que las llenes dinámicamente
-  const stats = {
+  const router = useRouter()
+
+  // Estados para estadísticas y tickets recientes
+  const [stats, setStats] = useState({
     totalTickets: 0,
     ticketsAbiertos: 0,
     ticketsEnProceso: 0,
     ticketsResueltos: 0,
     equiposTotal: 0,
     usuariosActivos: 0,
-  }
+  })
 
-  const recentTickets: Array<{
-    id: number
-    equipo: string
-    usuario: string
-    tipo: string
-    estatus: string
-    fecha: string
-  }> = []
+  const [recentTickets, setRecentTickets] = useState([])
 
+  // Fetch de estadísticas y tickets recientes desde el backend Django
+  useEffect(() => {
+    // Aquí podrías llamar a tu API para obtener las estadísticas y tickets recientes
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/dashboard/") // Asegúrate de que esta ruta sea la correcta
+        const data = await response.json()
+
+        // Asignar datos de las estadísticas
+        setStats({
+          totalTickets: data.totalTickets,
+          ticketsAbiertos: data.ticketsAbiertos,
+          ticketsEnProceso: data.ticketsEnProceso,
+          ticketsResueltos: data.ticketsResueltos,
+          equiposTotal: data.equiposTotal,
+          usuariosActivos: data.usuariosActivos,
+        })
+
+        // Asignar los tickets recientes
+        setRecentTickets(data.recentTickets)
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Función para obtener el color basado en el estado de los tickets
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Abierto":
@@ -60,6 +89,8 @@ export default function DashboardPage() {
               <Link href="/usuarios">
                 <Button variant="ghost">Usuarios</Button>
               </Link>
+              {/* Botón para cerrar sesión */}
+              <LogoutButton />
             </nav>
           </div>
         </div>

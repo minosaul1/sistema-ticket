@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Users, Plus, Search, Filter, Eye, Edit, Mail, Phone } from "lucide-react"
+import { LogoutButton } from "@/components/LogoutButton" // Importar el botón de cierre de sesión
 
 export default function UsuariosPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -69,6 +70,8 @@ export default function UsuariosPage() {
               <Link href="/usuarios">
                 <Button variant="ghost">Usuarios</Button>
               </Link>
+              {/* Aquí agregamos el LogoutButton que ya maneja la acción de cerrar sesión */}
+              <LogoutButton />
             </nav>
           </div>
         </div>
