@@ -1,31 +1,51 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
+import axios from "axios"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Ticket, Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    correo: "",
+    username: "",
     password: "",
-    rol: "",
   })
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  interface TokenResponse {
+    access: string;
+    refresh: string;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulación de login - en producción conectar con la base de datos
-    console.log("Login attempt:", formData)
-    router.push("/dashboard")
+    try {
+      const response = await axios.post<TokenResponse>("http://localhost:8000/api/token/", {
+        username: formData.username,
+        password: formData.password,
+      })
+
+      const { access, refresh } = response.data
+      localStorage.setItem("access_token", access)
+      localStorage.setItem("refresh_token", refresh)
+
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Login failed", error)
+      alert("Credenciales incorrectas")
+    }
   }
 
   return (
@@ -41,13 +61,13 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="correo">Correo Electrónico</Label>
+              <Label htmlFor="username">Nombre de Usuario</Label>
               <Input
-                id="correo"
-                type="email"
-                placeholder="usuario@empresa.com"
-                value={formData.correo}
-                onChange={(e) => setFormData({ ...formData, correo: e.target.value })}
+                id="username"
+                type="text"
+                placeholder="usuario123"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 required
               />
             </div>
@@ -74,20 +94,6 @@ export default function LoginPage() {
                 </Button>
               </div>
             </div>
-
-            {/*<div className="space-y-2">
-              <Label htmlFor="rol">Rol</Label>
-              <Select value={formData.rol} onValueChange={(value) => setFormData({ ...formData, rol: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona tu rol" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Admin">Administrador</SelectItem>
-                  <SelectItem value="Técnico">Técnico</SelectItem>
-                  <SelectItem value="Usuario">Usuario</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>*/}
 
             <Button type="submit" className="w-full">
               Iniciar Sesión

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Monitor, Plus, Search, Filter, Eye, Edit } from "lucide-react"
-import { LogoutButton } from "@/components/LogoutButton" // Importar el botón de cierre de sesión
+import { EquiposList } from "@/components/Equipo/EquiposList"
 
 export default function EquiposPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -117,71 +117,8 @@ export default function EquiposPage() {
             </Link>
           </div>
         </div>
+        <EquiposList />
 
-        {/* Equipos Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Equipos</CardTitle>
-            <CardDescription>{filteredEquipos.length} equipos encontrados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Equipo</TableHead>
-                  <TableHead>Marca/Modelo</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Especificaciones</TableHead>
-                  <TableHead>Usuario</TableHead>
-                  <TableHead>Ubicación</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEquipos.map((equipo) => (
-                  <TableRow key={equipo.id}>
-                    <TableCell className="font-medium">
-                      <div>
-                        <p className="font-semibold">{equipo.nom_equipo}</p>
-                        <p className="text-xs text-gray-500">{equipo.n_serie}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{equipo.marca}</p>
-                        <p className="text-sm text-gray-600">{equipo.modelo}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getTipoColor(equipo.tipo_equipo)}>{equipo.tipo_equipo}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <p>{equipo.ram} RAM</p>
-                        <p>
-                          {equipo.disco} {equipo.capacidad}
-                        </p>
-                        <p className="text-xs text-gray-500">{equipo.procesador}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{equipo.usuario}</TableCell>
-                    <TableCell className="text-sm">{equipo.ubicacion}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </main>
     </div>
   )
