@@ -78,7 +78,7 @@ export default function EquiposPage() {
               <Link href="/usuarios">
                 <Button variant="ghost">Usuarios</Button>
               </Link>
-              <LogoutButton />
+
             </nav>
           </div>
         </div>
