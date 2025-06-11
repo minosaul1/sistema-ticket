@@ -1,81 +1,47 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Users, Plus, Search, Filter, Eye, Edit, Mail, Phone } from "lucide-react"
-import { LogoutButton } from "@/components/LogoutButton" // Importar el botón de cierre de sesión
+import { Plus, Search, Filter } from "lucide-react"
+import { UsuarioList } from "@/components/Usuario/UsuarioList"
+import { UserData } from "@/types/User.types"
+import { getAllUser } from "@/api/Usuarios.api"
+import toast from "react-hot-toast"
 
 export default function UsuariosPage() {
+  const [usuarios, setUsuarios] = useState<UserData[]>([]);
   const [searchTerm, setSearchTerm] = useState("")
-  const [rolFilter, setRolFilter] = useState("all")
+  const [rolFilter, setRolFilter] = useState<"all" | "admin" | "tecnico" | "usuario">("all");
+  //const [rolFilter, setRolFilter] = useState("all");
 
-  // Array vacío para llenar con datos reales
-  const usuarios: Array<{
-    id: number
-    nombre: string
-    correo: string
-    telefono: string
-    rol: string
-    equipos_asignados: number
-    tickets_activos: number
-  }> = []
 
-  const getRolColor = (rol: string) => {
-    switch (rol) {
-      case "Admin":
-        return "destructive"
-      case "Técnico":
-        return "default"
-      case "Usuario":
-        return "secondary"
-      default:
-        return "outline"
-    }
-  }
+  useEffect(() => {
+    getAllUser()
+      .then(data => {
+        setUsuarios(data)
+        toast.success("Usuarios cargados con exito")
+      })
+      .catch((err) => toast.error("Error al cargar usuarios", err));
+  }, []);
+
+  const handleRolChange = (value: string) => {
+    setRolFilter(value as "all" | "admin" | "tecnico" | "usuario");
+  };
 
   const filteredUsuarios = usuarios.filter((usuario) => {
+    const term = searchTerm.toLowerCase();
     const matchesSearch =
-      usuario.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      usuario.correo.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRol = rolFilter === "all" || usuario.rol === rolFilter
+      usuario.user.first_name.toLowerCase().includes(term) ||
+      usuario.user.email.toLowerCase().includes(term)
+    const matchesRol = rolFilter === "all" || usuario.role.toLowerCase() === rolFilter;
     return matchesSearch && matchesRol
   })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
-            </div>
-            <nav className="flex space-x-4">
-              <Link href="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-              <Link href="/tickets">
-                <Button variant="ghost">Tickets</Button>
-              </Link>
-              <Link href="/equipos">
-                <Button variant="ghost">Equipos</Button>
-              </Link>
-              <Link href="/usuarios">
-                <Button variant="ghost">Usuarios</Button>
-              </Link>
-              {/* Aquí agregamos el LogoutButton que ya maneja la acción de cerrar sesión */}
-              <LogoutButton />
-            </nav>
-          </div>
-        </div>
-      </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Actions Bar */}
@@ -90,16 +56,16 @@ export default function UsuariosPage() {
             />
           </div>
           <div className="flex gap-2">
-            <Select value={rolFilter} onValueChange={setRolFilter}>
+            <Select value={rolFilter} onValueChange={handleRolChange}>
               <SelectTrigger className="w-40">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Admin">Administrador</SelectItem>
-                <SelectItem value="Técnico">Técnico</SelectItem>
-                <SelectItem value="Usuario">Usuario</SelectItem>
+                <SelectItem value="admin">Administrador</SelectItem>
+                <SelectItem value="tecnico">Técnico</SelectItem>
+                <SelectItem value="usuario">Usuario</SelectItem>
               </SelectContent>
             </Select>
             <Link href="/usuarios/nuevo">
@@ -112,75 +78,9 @@ export default function UsuariosPage() {
         </div>
 
         {/* Usuarios Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Usuarios</CardTitle>
-            <CardDescription>{filteredUsuarios.length} usuarios encontrados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Usuario</TableHead>
-                  <TableHead>Contacto</TableHead>
-                  <TableHead>Rol</TableHead>
-                  <TableHead>Equipos</TableHead>
-                  <TableHead>Tickets Activos</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsuarios.map((usuario) => (
-                  <TableRow key={usuario.id}>
-                    <TableCell className="font-medium">
-                      <div>
-                        <p className="font-semibold">{usuario.nombre}</p>
-                        <p className="text-xs text-gray-500">ID: {usuario.id}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1 text-sm">
-                          <Mail className="h-3 w-3 text-gray-400" />
-                          <span className="text-gray-600">{usuario.correo}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm">
-                          <Phone className="h-3 w-3 text-gray-400" />
-                          <span className="text-gray-600">{usuario.telefono}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getRolColor(usuario.rol)}>{usuario.rol}</Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <span className="text-sm font-medium">{usuario.equipos_asignados}</span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <span
-                        className={`text-sm font-medium ${
-                          usuario.tickets_activos > 0 ? "text-orange-600" : "text-gray-500"
-                        }`}
-                      >
-                        {usuario.tickets_activos}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <UsuarioList usuarios={filteredUsuarios} />
+
+        <></>
       </main>
     </div>
   )

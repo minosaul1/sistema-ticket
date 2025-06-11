@@ -9,63 +9,54 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertCircle } from "lucide-react"
+import { useForm, Controller } from "react-hook-form";
+import { createUser } from '@/api/Usuarios.api'
 
 interface FormData {
-  nombre: string
-  correo: string
-  telefono: string
-  rol: string
-}
+  first_name: string;
+  last_name: string;
+  email: string;
+  telephone?: string;
+  rol: "admin" | "tecnico" | "usuario";
+  username: string;
+  password: string;
+};
 
 export default function NuevoUsuarioPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState<FormData>({
-    nombre: "",
-    correo: "",
-    telefono: "",
-    rol: "",
-  })
-  const [errors, setErrors] = useState<Partial<FormData>>({})
+  const { register, handleSubmit, control, formState: { errors }, reset } = useForm<FormData>();
   const [submitting, setSubmitting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
 
-  function validate() {
-    const newErrors: Partial<FormData> = {}
-    if (!formData.nombre.trim()) newErrors.nombre = "El nombre es obligatorio"
-    if (!formData.correo.trim()) newErrors.correo = "El correo es obligatorio"
-    else if (!/^\S+@\S+\.\S+$/.test(formData.correo)) newErrors.correo = "Correo no válido"
-    if (!formData.telefono.trim()) newErrors.telefono = "El teléfono es obligatorio"
-    if (!formData.rol.trim()) newErrors.rol = "El rol es obligatorio"
-    return newErrors
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setServerError(null)
-    const validationErrors = validate()
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
+  const onSubmit = async (data: FormData) => {
+    setSubmitting(true);
+    setServerError(null);
+    const payload = {
+      user: {
+        username: `${data.first_name.toLowerCase()}_${Date.now()}`,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        password: data.password
+      },
+      telephone: data.telephone ?? null,
+      address: null,
+      role_input: data.rol,
+      equipos_asignados: 0,
+      tickets_activos: 0,
     }
-    setErrors({})
-    setSubmitting(true)
-
     try {
-      const res = await fetch("/api/usuarios/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null)
-        throw new Error(errorData?.detail || "Error al crear usuario")
-      }
-      router.push("/usuarios")
+      await createUser(payload);
+      router.push("/usuarios");
     } catch (error: any) {
-      setServerError(error.message || "Error al enviar los datos")
-      setSubmitting(false)
+      //console.error(error);
+      setServerError("No se pudo crear el usuario.");
+    } finally {
+      setSubmitting(false);
     }
-  }
+  };
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -74,9 +65,7 @@ export default function NuevoUsuarioPage() {
           <div className="flex justify-between items-center py-6">
             <h1 className="text-2xl font-bold text-gray-900">Agregar Nuevo Usuario</h1>
             <Link href="/usuarios">
-              <Button variant="outline" disabled={submitting}>
-                Cancelar
-              </Button>
+              <Button variant="outline" disabled={submitting}>Cancelar</Button>
             </Link>
           </div>
         </div>
@@ -96,68 +85,62 @@ export default function NuevoUsuarioPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-
-              {/* Nombre */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <Label htmlFor="nombre">Nombre *</Label>
-                <Input
-                  id="nombre"
-                  value={formData.nombre}
-                  onChange={e => setFormData({ ...formData, nombre: e.target.value })}
-                  disabled={submitting}
-                  aria-invalid={!!errors.nombre}
-                />
-                {errors.nombre && <p className="text-red-600 text-sm mt-1">{errors.nombre}</p>}
+                <Label htmlFor="first_name">Nombre *</Label>
+                <Input id="first_name" {...register("first_name", { required: true })} disabled={submitting} />
+                {errors.first_name && <p className="text-red-600 text-sm">Este campo es obligatorio</p>}
               </div>
 
-              {/* Correo */}
               <div>
-                <Label htmlFor="correo">Correo *</Label>
-                <Input
-                  id="correo"
-                  type="email"
-                  value={formData.correo}
-                  onChange={e => setFormData({ ...formData, correo: e.target.value })}
-                  disabled={submitting}
-                  aria-invalid={!!errors.correo}
-                />
-                {errors.correo && <p className="text-red-600 text-sm mt-1">{errors.correo}</p>}
+                <Label htmlFor="last_name">Apellido *</Label>
+                <Input id="last_name" {...register("last_name", { required: true })} disabled={submitting} />
+                {errors.last_name && <p className="text-red-600 text-sm">Este campo es obligatorio</p>}
               </div>
 
-              {/* Teléfono */}
               <div>
-                <Label htmlFor="telefono">Teléfono *</Label>
-                <Input
-                  id="telefono"
-                  value={formData.telefono}
-                  onChange={e => setFormData({ ...formData, telefono: e.target.value })}
-                  disabled={submitting}
-                  aria-invalid={!!errors.telefono}
-                />
-                {errors.telefono && <p className="text-red-600 text-sm mt-1">{errors.telefono}</p>}
+                <Label htmlFor="email">Correo *</Label>
+                <Input id="email" type="email" {...register("email", { required: true })} disabled={submitting} />
+                {errors.email && <p className="text-red-600 text-sm">Correo inválido o requerido</p>}
               </div>
 
-              {/* Rol */}
               <div>
-                <Label htmlFor="rol">Rol *</Label>
-                <Select
-                  id="rol"
-                  value={formData.rol}
-                  onValueChange={value => setFormData({ ...formData, rol: value })}
+                <Label htmlFor="telephone">Teléfono</Label>
+                <Input id="telephone" {...register("telephone")} disabled={submitting} />
+              </div>
+
+              <div>
+                <Label htmlFor="password">Contraseña *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  {...register("password", { required: true, minLength: 6 })}
+                  placeholder="Contraseña"
                   disabled={submitting}
-                  aria-invalid={!!errors.rol}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un rol" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Admin">Administrador</SelectItem>
-                    <SelectItem value="Técnico">Técnico</SelectItem>
-                    <SelectItem value="Usuario">Usuario</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.rol && <p className="text-red-600 text-sm mt-1">{errors.rol}</p>}
+                />
+                {errors.password && <p className="text-red-600 text-sm">Contraseña requerida (mínimo 8 caracteres)</p>}
+              </div>
+
+              <div>
+                <Label>Rol *</Label>
+                <Controller
+                  name="rol"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select disabled={submitting} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un rol" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                        <SelectItem value="tecnico">Técnico</SelectItem>
+                        <SelectItem value="usuario">Usuario</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.rol && <p className="text-red-600 text-sm mt-1">Selecciona un rol</p>}
               </div>
 
               <Button type="submit" disabled={submitting} className="w-full">

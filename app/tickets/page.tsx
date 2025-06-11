@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,25 +8,31 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Ticket, Plus, Search, Filter, Eye } from "lucide-react"
-import { LogoutButton } from "@/components/LogoutButton" // Importar el botón de cierre de sesión
+import { Plus, Search, Filter, Edit } from "lucide-react"
+import { obtenerTickets } from '@/api/Tikets.api'
+import { TiketsData } from '@/types/tikets.types'
+import toast from "react-hot-toast"
+
 
 export default function TicketsPage() {
+
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [Tikets, setTikets] = useState<TiketsData[]>([]);
+  const [loading, setLoading] = useState(true)
 
-  // Array vacío para llenar con datos reales en producción
-  const tickets: Array<{
-    id: number
-    equipo: string
-    usuario: string
-    tecnico: string | null
-    tipo: string
-    estatus: string
-    fecha_reporte: string
-    fecha_inicio: string
-    observaciones: string
-  }> = []
+  useEffect(() => {
+    obtenerTickets()
+      .then(data => {
+        setTikets(data)
+        setLoading(false)
+        toast.success("Tickets cargados con exito")
+      })
+      .catch(() => {
+        toast.error("error al mostrar los tikets")
+        setLoading(false)
+      })
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -43,51 +49,35 @@ export default function TicketsPage() {
     }
   }
 
-  const filteredTickets = tickets.filter((ticket) => {
+  const filteredTickets = Tikets.filter((ticket) => {
+    const lower = searchTerm.toLowerCase()
     const matchesSearch =
-      ticket.equipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.usuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.tipo.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || ticket.estatus === statusFilter
+      ticket.fk_equipo.toString().includes(lower) ||
+      ticket.fecha_reporte.toLowerCase().includes(lower) ||
+      ticket.tipo_servicio.toLowerCase().includes(lower) ||
+      ticket.comentarios.toLowerCase().includes(lower) ||
+      ticket.fk_reporta.toLowerCase().includes(lower) ||
+      (ticket.fk_tecnico?.toLowerCase().includes(lower) ?? false)
+
+    const matchesStatus =
+      statusFilter === "all" || ticket.estatus === statusFilter
+
     return matchesSearch && matchesStatus
   })
 
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <Ticket className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">Gestión de Tickets</h1>
-            </div>
-            <nav className="flex space-x-4">
-              <Link href="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-              <Link href="/tickets">
-                <Button variant="ghost">Tickets</Button>
-              </Link>
-              <Link href="/equipos">
-                <Button variant="ghost">Equipos</Button>
-              </Link>
-              <Link href="/usuarios">
-                <Button variant="ghost">Usuarios</Button>
-              </Link>
-              <LogoutButton />
-            </nav>
-          </div>
-        </div>
-      </header>
 
+
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Actions Bar */}
+        {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Buscar tickets..."
+              placeholder="Buscar tickets por usuario o tecnico..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -97,7 +87,7 @@ export default function TicketsPage() {
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
                 <Filter className="h-4 w-4 mr-2" />
-                <SelectValue />
+                <SelectValue placeholder="Filtrar por estado" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
@@ -108,10 +98,7 @@ export default function TicketsPage() {
               </SelectContent>
             </Select>
             <Link href="/tickets/nuevo">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Ticket
-              </Button>
+              <Button><Plus className="h-4 w-4 mr-2" />Nuevo Ticket</Button>
             </Link>
           </div>
         </div>
@@ -127,12 +114,15 @@ export default function TicketsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID</TableHead>
+                  <TableHead>Estatus</TableHead>
+                  <TableHead>Fecha Reporte</TableHead>
+                  <TableHead>Inicio Servicio</TableHead>
+                  <TableHead>Finalizó Servicio</TableHead>
+                  <TableHead>Servicio</TableHead>
+                  <TableHead>Comentarios</TableHead>
                   <TableHead>Equipo</TableHead>
-                  <TableHead>Usuario</TableHead>
+                  <TableHead>Reportó</TableHead>
                   <TableHead>Técnico</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Fecha</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -141,25 +131,34 @@ export default function TicketsPage() {
                   <TableRow key={ticket.id}>
                     <TableCell className="font-medium">#{ticket.id}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{ticket.equipo}</Badge>
+                      <Badge variant={getStatusColor(ticket.estatus)}>
+                        {ticket.estatus}
+                      </Badge>
                     </TableCell>
-                    <TableCell>{ticket.usuario}</TableCell>
+                    <TableCell className="text-sm">{new Date(ticket.fecha_reporte).toLocaleString()}</TableCell>
+                    <TableCell className="text-sm">
+                      {ticket.fecha_inicio ? new Date(ticket.fecha_inicio).toLocaleString() : "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {ticket.fecha_final ? new Date(ticket.fecha_final).toLocaleString() : "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">{ticket.tipo_servicio}</TableCell>
+                    <TableCell className="text-sm">{ticket.comentarios}</TableCell>
                     <TableCell>
-                      {ticket.tecnico ? (
-                        <span className="text-sm">{ticket.tecnico}</span>
-                      ) : (
-                        <span className="text-sm text-gray-500">Sin asignar</span>
-                      )}
+                      <Badge variant="outline">{ticket.fk_equipo.id}</Badge>
+                      <Badge variant="outline">{ticket.fk_equipo.marca}</Badge>
+                      <Badge variant="outline">{ticket.fk_equipo.modelo}</Badge>
                     </TableCell>
-                    <TableCell className="text-sm">{ticket.tipo}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusColor(ticket.estatus)}>{ticket.estatus}</Badge>
+                    <TableCell className="text-sm">{ticket.fk_reporta}</TableCell>
+                    <TableCell className="text-sm">
+                      {ticket.fk_tecnico ? ticket.fk_tecnico : <span className="text-gray-500">Sin asignar</span>}
                     </TableCell>
-                    <TableCell className="text-sm">{ticket.fecha_reporte}</TableCell>
+
+
                     <TableCell>
                       <Link href={`/tickets/${ticket.id}`}>
                         <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
+                          <Edit className="w-4 h-4" />
                         </Button>
                       </Link>
                     </TableCell>

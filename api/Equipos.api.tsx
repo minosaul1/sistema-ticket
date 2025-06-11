@@ -1,32 +1,24 @@
-import axios from 'axios';
-export type EquiposData = {
-    id: number;
-    marca: string;
-    tipo_equipo: string;
-    ram: number;
-    disco: string;
-    capacidad: number;
-    procesador: string;
-    n_serial: string;
-    mac: string;
-    modelo: string;
-    ubicacion: String;
-};
-const Equipos = axios.create({
-    baseURL: 'http://localhost:8000/control'
-})
+import api from '@/api/axiosConfig';
+import { EquiposData } from '@/types/EquipoTypes'
 
-//export const AllgetEquipos = () => {
-//   return axios.get<EquiposData[]>('/')
-//}
 
-export const AllgetEquipos = () => {
-    const token = localStorage.getItem("access_token");
-    return Equipos.get<EquiposData[]>('/equipo/', {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    });
+export const AllgetEquipos = async (): Promise<EquiposData[]> => {
+    const res = await api.get<EquiposData[]>('/equipo/');
+    return res.data
 }
 
-export const CreateEquipo = (data: Omit<EquiposData, "id">) => Equipos.post('/equipo/', data);
+export const CreateEquipo = async (data: Omit<EquiposData, "id">): Promise<EquiposData> => {
+    const res = await api.post<EquiposData>('/equipo/', data)
+    return res.data;
+}
+
+export const getEquipoId = async (id: number): Promise<EquiposData> => {
+    const res = await api.get<EquiposData>(`/equipo/${id}/`);
+    return res.data
+}
+
+export const getEquiposSinReporte = async (): Promise<EquiposData[]> => {
+    const res = await api.get<EquiposData[]>('/equipo/equipos-disponibles/')
+    return res.data
+}
+//export const CreateEquipo = (data: Omit<EquiposData, "id">) => Equipos.post('/equipo/', data);

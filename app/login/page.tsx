@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Ticket, Eye, EyeOff } from "lucide-react"
+import toast from "react-hot-toast"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +45,8 @@ export default function LoginPage() {
       router.push("/dashboard")
     } catch (error) {
       console.error("Login failed", error)
-      alert("Credenciales incorrectas")
+      //alert("Credenciales incorrectas")
+      toast.error(" " + error)
     }
   }
 

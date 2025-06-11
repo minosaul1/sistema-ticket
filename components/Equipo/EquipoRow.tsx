@@ -1,9 +1,10 @@
 // components/EquipoRow.tsx
-import { EquiposData } from "@/api/Equipos.api"
+import { EquiposData } from "@/types/EquipoTypes"
 import { TableRow, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Eye, Edit } from "lucide-react"
+import Link from "next/link"
 
 type EquipoRowProps = {
   equipo: EquiposData
@@ -51,8 +52,10 @@ export function EquipoRow({ equipo }: EquipoRowProps) {
       <TableCell className="text-sm">{equipo.ubicacion}</TableCell>
       <TableCell>
         <div className="flex gap-1">
-          <Button variant="ghost" size="sm"><Eye className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="sm"><Edit className="h-4 w-4" /></Button>
+          <Link href="/equipos/nuevo">
+            <Button variant="ghost" size="sm"><Eye className="h-4 w-4" /></Button>
+            {/*  <Button variant="ghost" size="sm"><Edit className="h-4 w-4" /></Button>*/}
+          </Link>
         </div>
       </TableCell>
     </TableRow>

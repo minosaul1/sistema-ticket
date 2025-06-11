@@ -1,27 +1,31 @@
-import axios from 'axios';
+import api from '@/api/axiosConfig'
+import { UserData, CreateUserPayload, TecnicoData } from '@/types/User.types'
 
 
 
-const Usuarios = axios.create({
-    baseURL: 'http://localhost:8000/control/usuario'
-});
+export const getAllUser = async (): Promise<UserData[]> => {
+    const res = await api.get<UserData[]>('/usuario/');
+    return res.data
+}
 
-// Métodos de API
-/*
-export const getAllProductos = () => ProductosApi.get('/');
+export const getUser = async (id: number): Promise<UserData> => {
+    const res = await api.get<UserData>(`/usuario/${id}`)
+    return res.data
 
-// El tipo `id` es `number` o `string`, según tu backend (usualmente `number` en Django)
-export const getProducto = (id: number | string) => ProductosApi.get(`/${id}/`);
+}
 
-export const createProducto = (data: ProductoData) => ProductosApi.post('/', data);
+export const getTecnicos = async (): Promise<TecnicoData[]> => {
+    const res = await api.get<TecnicoData[]>('/usuario/tecnicos-list/');
+    return res.data
+}
 
-export const deleteProducto = (id: number | string) => ProductosApi.delete(`/${id}/`);
+export const createUser = async (data: CreateUserPayload): Promise<UserData> => {
+    const res = await api.post<UserData>('/usuario/', data)
+    return res.data
 
-export const updateProducto = (id: number | string, data: ProductoData) =>
-    ProductosApi.put(`/${id}/`, data);
+}
 
-
-export const getProductoByCodigo = (codigo: string) => {
-    return axios.get(`/api/producto/${codigo}/`);
-};
-*/
+export const UpdateUser = async (id: number, data: Partial<UserData>): Promise<UserData> => {
+    const res = await api.patch<UserData>(`/usuario/${id}/`, data);
+    return res.data
+}

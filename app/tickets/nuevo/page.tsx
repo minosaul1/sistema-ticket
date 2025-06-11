@@ -1,66 +1,68 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Ticket, ArrowLeft, Save } from "lucide-react"
+import { useForm, Controller } from "react-hook-form";
+import { getEquiposSinReporte } from '@/api/Equipos.api'
+import { CreateTicket } from '@/api/Tikets.api'
+import toast from "react-hot-toast"
+import { EquiposData } from '@/types/EquipoTypes'
+interface FormData {
+
+  servicio: string;
+  comentarios: string;
+  equipo: number;
+};
 
 export default function NuevoTicketPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
-    equipo: "",
-    usuario_reporta: "",
-    tecnico: "",
-    tipo_servicio: "",
-    observaciones: "",
-    comentarios: "",
-  })
+  const { register, handleSubmit, control, formState: { errors }, reset } = useForm<FormData>()
+  const [submitting, setSubmitting] = useState(false)
+  const [Equipos, setEquipos] = useState<EquiposData[]>([]);
+  const [serverError, setServerError] = useState<string | null>(null)
 
-  // Datos simulados - en producción vendrían de la base de datos
-  const equipos = [
-    { id: 1, nombre: "PC-001", ubicacion: "Oficina 101" },
-    { id: 2, nombre: "LAP-005", ubicacion: "Sala de Juntas" },
-    { id: 3, nombre: "PC-012", ubicacion: "Recepción" },
-    { id: 4, nombre: "LAP-008", ubicacion: "Oficina 205" },
-  ]
+  useEffect(() => {
+    getEquiposSinReporte()
+      .then(data => {
+        setEquipos(data)
+      })
+      .catch(() => {
+        toast.error("error al cargar lo equipos")
+      })
+  }, [])
 
-  const usuarios = [
-    { id: 1, nombre: "Juan Pérez", rol: "Usuario" },
-    { id: 2, nombre: "María García", rol: "Usuario" },
-    { id: 3, nombre: "Carlos López", rol: "Usuario" },
-    { id: 4, nombre: "Laura Sánchez", rol: "Usuario" },
-  ]
+  const onSubmit = async (data: FormData) => {
+    setSubmitting(true)
+    setServerError(null);
+    const payload = {
+      tipo_servicio: data.servicio,
+      comentarios: data.comentarios,
+      fk_equipo: data.equipo
+    }
 
-  const tecnicos = [
-    { id: 5, nombre: "Ana Martínez", rol: "Técnico" },
-    { id: 6, nombre: "Carlos Ruiz", rol: "Técnico" },
-    { id: 7, nombre: "Pedro González", rol: "Técnico" },
-  ]
+    try {
+      await CreateTicket(payload);
 
-  const tiposServicio = [
-    "Mantenimiento Preventivo",
-    "Mantenimiento Correctivo",
-    "Reparación",
-    "Instalación Software",
-    "Instalación Hardware",
-    "Soporte Técnico",
-    "Configuración",
-    "Actualización",
-  ]
+      router.push("/tickets");
+      toast.success("Ticket creado con exito...")
+    } catch (error: any) {
+      setServerError("No se pudo crear el ticket.");
+      toast.success("Error, Intentarlo mas tarde...")
+    }
+    finally {
+      setSubmitting(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Aquí se enviarían los datos a la base de datos
-    console.log("Nuevo ticket:", formData)
-    router.push("/tickets")
+    }
   }
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -81,146 +83,64 @@ export default function NuevoTicketPage() {
           </div>
         </div>
       </header>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>Crear Nuevo Ticket de Soporte</CardTitle>
-            <CardDescription>Completa la información para crear un nuevo ticket de soporte técnico</CardDescription>
+            <CardTitle>Crear un Nuevo Ticket</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Usuario que reporta */}
-                {/*<div className="space-y-2">
-                  <Label htmlFor="usuario_reporta">Usuario que Reporta *</Label>
-                  <Select
-                    value={formData.usuario_reporta}
-                    onValueChange={(value) => setFormData({ ...formData, usuario_reporta: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el usuario" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {usuarios.map((usuario) => (
-                        <SelectItem key={usuario.id} value={usuario.nombre}>
-                          {usuario.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>*/}
-                
-                {/* Equipo */}
-                {/*<div className="space-y-2">
-                  <Label htmlFor="equipo">Equipo *</Label>
-                  <Select
-                    value={formData.equipo}
-                    onValueChange={(value) => setFormData({ ...formData, equipo: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona un equipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {equipos.map((equipo) => (
-                        <SelectItem key={equipo.id} value={equipo.nombre}>
-                          {equipo.nombre} - {equipo.ubicacion}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>*/}
-
-                {/* Técnico asignado */}
-                {/*<div className="space-y-2">
-                  <Label htmlFor="tecnico">Técnico Asignado</Label>
-                  <Select
-                    value={formData.tecnico}
-                    onValueChange={(value) => setFormData({ ...formData, tecnico: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Asignar técnico (opcional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Sin asignar">Sin asignar</SelectItem>
-                      {tecnicos.map((tecnico) => (
-                        <SelectItem key={tecnico.id} value={tecnico.nombre}>
-                          {tecnico.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>*/}
-
-              {/* Equipo */}
-              <div className="space-y-2">
-                <Label htmlFor="observaciones">Equipo *</Label>
-                <Textarea
-                  id="observaciones"
-                  placeholder="Describe la marca de tu equipo"
-                  value={formData.observaciones}
-                  onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                  rows={4}
-                  required
-                />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div>
+                <Label htmlFor="tipo_servicio">Servicio*</Label>
+                <Input id="tipo_servicio" {...register("servicio", { required: true })} disabled={submitting} />
+                {errors.servicio && <p className="text-red-600 text-sm">Este campo es obligatorio</p>}
               </div>
 
-              {/* Especificaciones */}
-              {/*<div className="space-y-2">
-                <Label htmlFor="observaciones">Especificaciones *</Label>
-                <Textarea
-                  id="observaciones"
-                  placeholder="Describe las especificaciones..."
-                  value={formData.observaciones}
-                  onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                  rows={4}
-                  required
-                />
-              </div> */}
-
-              {/* Observaciones */}
-              {/*<div className="space-y-2">
-                <Label htmlFor="observaciones">Observaciones *</Label>
-                <Textarea
-                  id="observaciones"
-                  placeholder="Describe el problema o solicitud..."
-                  value={formData.observaciones}
-                  onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
-                  rows={4}
-                  required
-                />
-              </div> */}
-
-              {/* Comentarios */}
-              <div className="space-y-2">
-                <Label htmlFor="comentarios">Comentarios </Label>
-                <Textarea
-                  id="comentarios"
-                  placeholder="Información adicional o comentarios..."
-                  value={formData.comentarios}
-                  onChange={(e) => setFormData({ ...formData, comentarios: e.target.value })}
-                  rows={3}
-                />
+              <div>
+                <Label htmlFor="comentarios">Comentarios*</Label>
+                <Input id="comentarios" {...register("comentarios", { required: true })} disabled={submitting} />
+                {errors.comentarios && <p className="text-red-600 text-sm">Este campo es obligatorio</p>}
               </div>
 
-              {/* Botones */}
-              <div className="flex gap-4 pt-6">
-                <Button type="submit" className="flex-1">
-                  <Save className="h-4 w-4 mr-2" />
-                  Crear Ticket
-                </Button>
-                <Link href="/tickets" className="flex-1">
-                  <Button type="button" variant="outline" className="w-full">
-                    Cancelar
-                  </Button>
-                </Link>
+              <div>
+                <Label htmlFor="equipo">Equipo*</Label>
+                <Controller
+                  name="equipo"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <select
+                      id="equipo"
+                      {...field}
+                      disabled={submitting}
+                      className="border border-gray-300 rounded px-2 py-1 w-full"
+                    >
+                      <option value="">-- Selecciona un equipo --</option>
+                      {Equipos.length === 0 ? (<option disabled value="">
+                        No hay opciones
+                      </option>
+                      ) : (
+                        Equipos.map((equipo) => (
+                          <option key={equipo.id} value={equipo.id}>
+                            {equipo.modelo}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  )}
+                />
+                {errors.equipo && (
+                  <p className="text-red-600 text-sm">Este campo es obligatorio</p>
+                )}
               </div>
-              </div>
+              <Button type="submit" disabled={submitting} className="w-full">
+                {submitting ? "Guardando..." : "Crear Ticket"}
+              </Button>
             </form>
+
           </CardContent>
         </Card>
       </main>
-    </div>
+    </div >
   )
 }

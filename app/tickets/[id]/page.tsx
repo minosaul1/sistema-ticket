@@ -1,53 +1,96 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from "@/components/ui/select"
+import { use, useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Ticket, ArrowLeft, Edit, Save, Monitor, User, Calendar, Clock } from "lucide-react"
+import { getTikect, UpdateTiket } from '@/api/Tikets.api'
+import { TiketsData } from '@/types/tikets.types'
+import { EquiposData } from '@/types/EquipoTypes'
+import { TecnicoData, UserData } from '@/types/User.types'
+import { getTecnicos } from '@/api/Usuarios.api'
+import { getEquipoId } from '@/api/Equipos.api'
+import toast from "react-hot-toast"
+import { useForm, Controller } from "react-hook-form";
 
-export default function TicketDetailPage({ params }: { params: { id: string } }) {
+
+interface FormData {
+  tecnico: string;
+};
+type Props = {
+  ticketData: TiketsData;
+  tecnicoData: TecnicoData;
+  setTicketData: (data: TiketsData) => void;
+  setTecnico: (data: TecnicoData) => void;
+};
+
+export default function TicketDetailPage({ params }: { params: Promise<{ id: number }> }) {
+  const { id } = use(params)
   const [isEditing, setIsEditing] = useState(false)
-  const [ticketData, setTicketData] = useState({
-    id: 1,
-    equipo: "PC-001",
-    usuario_reporta: "Juan Pérez",
-    tecnico: "Ana Martínez",
-    estatus: "En Proceso",
-    fecha_reporte: "2024-01-15 09:30:00",
-    fecha_inicio: "2024-01-15 10:00:00",
-    fecha_final: null,
-    tipo_servicio: "Mantenimiento Preventivo",
-    observaciones:
-      "Limpieza general del equipo, actualización de software antivirus y verificación de componentes internos.",
-    comentarios: "El equipo presenta acumulación de polvo en ventiladores. Se requiere limpieza profunda.",
-  })
+  const [ticketData, setTicketData] = useState<TiketsData | null>(null)
+  const [tecnico, setTecnico] = useState<TecnicoData[]>([])
+  const [equipoData, setEquipoData] = useState<EquiposData | null>(null)
+  const { register, handleSubmit, control, formState: { errors }, reset, getValues } = useForm<FormData>()
+  const [submitting, setSubmitting] = useState(false)
 
-  // Datos del equipo asociado
-  const equipoInfo = {
-    marca: "Dell",
-    modelo: "OptiPlex 7090",
-    tipo_equipo: "Desktop",
-    ram: "16GB",
-    disco: "SSD",
-    capacidad: "512GB",
-    procesador: "Intel Core i7-11700",
-    n_serie: "DL2024001",
-    nom_equipo: "PC-001",
-    mac: "00:1B:44:11:3A:B7",
-    ubicacion: "Oficina 101",
-  }
+
+  useEffect(() => {
+    const fetchTicket = async () => {
+      try {
+        const data = await getTikect(id)
+        if (data.estatus.toLowerCase() === "cerrado") {
+          toast.error("No puedes reabrir ticket cerrado")
+          return
+        }
+
+        const dataEquipo = await getEquipoId(data.fk_equipo.id)
+        setEquipoData(dataEquipo)
+        setTicketData(data)
+        toast.success("Ticket cargado con éxito...")
+      }
+      catch (error) {
+        //console.log(error)
+        toast.error("Error al cargar el Ticket...")
+      }
+
+    }
+    fetchTicket()
+  }, [id])
+  // Carga técnicos
+  useEffect(() => {
+    const fetchTecnico = async () => {
+      try {
+        const data = await getTecnicos()
+        setTecnico(data)
+      }
+      catch (error) {
+        toast.error("Error al cargar tecnicos...")
+      }
+    };
+    fetchTecnico();
+  }, [])
+
+  if (!ticketData || !equipoData) return (
+    <div className="min-h-screen flex items-center justify-center text-gray-500">
+      cargando Ticket...
+    </div>
+  )
+
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Abierto":
         return "destructive"
-      case "En Proceso":
+      case "En proceso":
         return "default"
       case "Resuelto":
         return "secondary"
@@ -58,11 +101,25 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
     }
   }
 
-  const handleSave = () => {
-    // Aquí se guardarían los cambios en la base de datos
-    console.log("Guardando cambios:", ticketData)
-    setIsEditing(false)
+  const handleSave = async () => {
+    try {
+      const updateData: Partial<TiketsData> = {
+        estatus: ticketData.estatus,
+        comentarios: ticketData.comentarios,
+      };
+      const updated = await UpdateTiket(ticketData.id, updateData);
+      setTicketData(updated);
+      setIsEditing(false);
+      toast.success("Estado actualizado correctamente");
+    }
+    catch (error) {
+      toast.error("Error al actualizar el ticket...")
+    }
+
+
   }
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -118,8 +175,7 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                 {isEditing ? (
                   <div className="space-y-2">
                     <Label>Estado del Ticket</Label>
-                    <Select
-                      value={ticketData.estatus}
+                    <Select value={ticketData.estatus}
                       onValueChange={(value) => setTicketData({ ...ticketData, estatus: value })}
                     >
                       <SelectTrigger>
@@ -127,15 +183,15 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Abierto">Abierto</SelectItem>
-                        <SelectItem value="En Proceso">En Proceso</SelectItem>
+                        <SelectItem value="En proceso">En proceso</SelectItem>
                         <SelectItem value="Resuelto">Resuelto</SelectItem>
                         <SelectItem value="Cerrado">Cerrado</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 ) : null}
-
                 {/* Observaciones */}
+                {/* 
                 <div className="space-y-2">
                   <Label>Observaciones</Label>
                   {isEditing ? (
@@ -147,8 +203,7 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                   ) : (
                     <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md">{ticketData.observaciones}</p>
                   )}
-                </div>
-
+                </div> */}
                 {/* Comentarios */}
                 <div className="space-y-2">
                   <Label>Comentarios</Label>
@@ -175,43 +230,43 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
+                  {/*<div>
                     <span className="font-medium">Nombre:</span>
-                    <p className="text-gray-600">{equipoInfo.nom_equipo}</p>
-                  </div>
+                    <p className="text-gray-600">{equipoData}</p>
+                  </div> */}
                   <div>
                     <span className="font-medium">Marca:</span>
-                    <p className="text-gray-600">{equipoInfo.marca}</p>
+                    <p className="text-gray-600">{equipoData.marca}</p>
                   </div>
                   <div>
                     <span className="font-medium">Modelo:</span>
-                    <p className="text-gray-600">{equipoInfo.modelo}</p>
+                    <p className="text-gray-600">{equipoData.modelo}</p>
                   </div>
                   <div>
                     <span className="font-medium">Tipo:</span>
-                    <p className="text-gray-600">{equipoInfo.tipo_equipo}</p>
+                    <p className="text-gray-600">{equipoData.tipo_equipo}</p>
                   </div>
                   <div>
                     <span className="font-medium">RAM:</span>
-                    <p className="text-gray-600">{equipoInfo.ram}</p>
+                    <p className="text-gray-600">{equipoData.ram}</p>
                   </div>
                   <div>
                     <span className="font-medium">Disco:</span>
                     <p className="text-gray-600">
-                      {equipoInfo.disco} {equipoInfo.capacidad}
+                      {equipoData.disco} {equipoData.capacidad}
                     </p>
                   </div>
                   <div>
                     <span className="font-medium">Procesador:</span>
-                    <p className="text-gray-600">{equipoInfo.procesador}</p>
+                    <p className="text-gray-600">{equipoData.procesador}</p>
                   </div>
                   <div>
                     <span className="font-medium">Ubicación:</span>
-                    <p className="text-gray-600">{equipoInfo.ubicacion}</p>
+                    <p className="text-gray-600">{equipoData.ubicacion}</p>
                   </div>
                   <div className="col-span-2">
                     <span className="font-medium">Número de Serie:</span>
-                    <p className="text-gray-600">{equipoInfo.n_serie}</p>
+                    <p className="text-gray-600">{equipoData.n_serial}</p>
                   </div>
                 </div>
               </CardContent>
@@ -230,16 +285,48 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                   <User className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">Reportado por</p>
-                    <p className="text-sm text-gray-600">{ticketData.usuario_reporta}</p>
+                    <p className="text-sm text-gray-600">{ticketData.fk_reporta}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <p className="text-sm font-medium">Técnico </p>
-                    <p className="text-sm text-gray-600">{ticketData.tecnico || "Sin asignar"}</p>
-                  </div>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <Label>Asigna un tecnico</Label>
+                      <Controller
+                        name="tecnico"
+                        control={control}
+                        rules={{ required: false }}
+                        render={({ field }) => (
+                          <Select onValueChange={field.onChange} value={field.value?.toString() || ""} disabled={submitting}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Selecciona un Técnico" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {tecnico.length === 0 ? (
+                                <SelectItem value="">No hay Técnicos disponibles.</SelectItem>
+                              ) : (
+                                tecnico.map(tec => (
+                                  <SelectItem key={tec.id} value={tec.nombre.toString()} >
+                                    {tec.nombre.toString()}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.tecnico && (
+                        <p className="text-red-600 text-sm">Este campo es obligatorio</p>)}
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-medium">Técnico </p>
+                      <p className="text-sm text-gray-600">{ticketData.fk_tecnico || "Sin asignar"}</p>
+                    </div>
+                  )}
+
                 </div>
 
                 <Separator />
@@ -248,7 +335,14 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">Fecha de reporte</p>
-                    <p className="text-sm text-gray-600">{ticketData.fecha_reporte}</p>
+                    <p className="text-sm text-gray-600">{new Date(ticketData.fecha_reporte).toLocaleDateString('es-MX', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}</p>
                   </div>
                 </div>
 
@@ -256,19 +350,32 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
                   <Clock className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">Fecha de inicio</p>
-                    <p className="text-sm text-gray-600">{ticketData.fecha_inicio}</p>
+                    <p className="text-sm text-gray-600">{ticketData.fecha_inicio ? new Date(ticketData.fecha_inicio).toLocaleDateString('es-MX', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })
+                      : 'sin fecha'}</p>
                   </div>
                 </div>
-
-                {ticketData.fecha_final && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <p className="text-sm font-medium">Fecha de finalización</p>
-                      <p className="text-sm text-gray-600">{ticketData.fecha_final}</p>
-                    </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <div>
+                    <p className="text-sm font-medium">Fecha Final</p>
+                    <p className="text-sm text-gray-600">{ticketData.fecha_final ? new Date(ticketData.fecha_final).toLocaleDateString('es-MX', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })
+                      : 'sin fecha'}</p>
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
 
@@ -293,8 +400,8 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
               </CardContent>
             </Card>
           </div>
-        </div>
-      </main>
-    </div>
+        </div >
+      </main >
+    </div >
   )
 }

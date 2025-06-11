@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import { CreateEquipo } from "@/api/Equipos.api"
-import { EquiposData } from "@/api/Equipos.api"
+import { EquiposData } from "@/types/EquipoTypes"
 import toast from "react-hot-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,7 +32,7 @@ export default function NuevoEquipoPage() {
       router.push("/equipos")
     } catch (error) {
       console.error("Error al crear equipo:", error)
-      toast.error("No se pudo crear el equipo ❌")
+      toast.error("No se pudo crear el equipo")
     }
   }
 

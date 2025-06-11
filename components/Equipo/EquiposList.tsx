@@ -8,7 +8,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { AllgetEquipos } from '../../api/Equipos.api';
-import type { EquiposData } from '../../api/Equipos.api';
+import type { EquiposData } from '@/types/EquipoTypes';
 import { EquipoRow } from '@/components/Equipo/EquipoRow';
 import { toast } from "react-hot-toast";
 
@@ -19,8 +19,8 @@ export function EquiposList() {
         async function loadEquipos() {
             try {
                 const res = await AllgetEquipos();
-                const data = res.data;
-                setEquipos(res.data);
+                //const data = res.data;
+                setEquipos(res);
                 //console.log("Datos recibidos:", data);
                 //setEquipos(Array.isArray(data) ? data : []);
                 toast.success("Equipos cargados correctamente.");
