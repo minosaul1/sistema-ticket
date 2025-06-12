@@ -9,6 +9,6 @@ export type EquiposData = {
     n_serial: string;
     mac: string;
     modelo: string;
-    ubicacion: String;
+    ubicacion: string;
     reportado: boolean;
 };

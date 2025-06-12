@@ -52,7 +52,7 @@ export function EquipoRow({ equipo }: EquipoRowProps) {
       <TableCell className="text-sm">{equipo.ubicacion}</TableCell>
       <TableCell>
         <div className="flex gap-1">
-          <Link href="/equipos/nuevo">
+          <Link href={`/equipos/${equipo.id}`}>
             <Button variant="ghost" size="sm"><Eye className="h-4 w-4" /></Button>
             {/*  <Button variant="ghost" size="sm"><Edit className="h-4 w-4" /></Button>*/}
           </Link>
