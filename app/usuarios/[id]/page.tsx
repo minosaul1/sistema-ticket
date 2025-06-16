@@ -59,7 +59,9 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: numbe
                 },
                 address: userData.address,
                 telephone: userData.telephone,
-                role_input: selectedRole
+                role_input: userData.role_input
+
+
 
             };
             const updated = await UpdateUser(userData.id, updateData);
@@ -219,7 +221,11 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: numbe
                                     value={userData?.role || ""}
                                     onValueChange={value =>
                                         setUserData(prev =>
-                                            prev ? { ...prev, role: value as "usuario" | "admin" | "tecnico" } : prev
+                                            prev ? {
+                                                ...prev,
+                                                role: value as UserRole,
+                                                role_input: value as UserRole,
+                                            } : prev
                                         )
                                     }
                                 >

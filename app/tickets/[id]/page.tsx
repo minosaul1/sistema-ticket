@@ -20,6 +20,7 @@ import { getTecnicos } from '@/api/Usuarios.api'
 import { getEquipoId } from '@/api/Equipos.api'
 import toast from "react-hot-toast"
 import { useForm, Controller } from "react-hook-form";
+import { data } from "autoprefixer";
 
 
 interface FormData {
@@ -102,15 +103,19 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
   }
 
   const handleSave = async () => {
+
     try {
       const updateData: Partial<TiketsData> = {
         estatus: ticketData.estatus,
         comentarios: ticketData.comentarios,
+
+        fk_tecnico: ticketData.fk_tecnico,
       };
       const updated = await UpdateTiket(ticketData.id, updateData);
       setTicketData(updated);
       setIsEditing(false);
-      toast.success("Estado actualizado correctamente");
+      console.log(ticketData.fk_tecnico),
+        toast.success("Estado actualizado correctamente");
     }
     catch (error) {
       toast.error("Error al actualizar el ticket...")
@@ -299,7 +304,16 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
                         control={control}
                         rules={{ required: false }}
                         render={({ field }) => (
-                          <Select onValueChange={field.onChange} value={field.value?.toString() || ""} disabled={submitting}>
+                          <Select
+                            onValueChange={(value) => {
+                              const id = parseInt(value); // Convertimos a número
+                              field.onChange(id);
+                              setTicketData(prev =>
+                                prev ? { ...prev, fk_tecnico: id } : prev
+                              );
+                            }}
+                            value={ticketData.fk_tecnico?.toString() || ""}
+                          >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="Selecciona un Técnico" />
                             </SelectTrigger>
@@ -308,8 +322,8 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
                                 <SelectItem value="">No hay Técnicos disponibles.</SelectItem>
                               ) : (
                                 tecnico.map(tec => (
-                                  <SelectItem key={tec.id} value={tec.nombre.toString()} >
-                                    {tec.nombre.toString()}
+                                  <SelectItem key={tec.id} value={tec.id.toString()} >
+                                    {tec.nombre}
                                   </SelectItem>
                                 ))
                               )}

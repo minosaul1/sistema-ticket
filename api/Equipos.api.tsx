@@ -23,7 +23,7 @@ export const getEquiposSinReporte = async (): Promise<EquiposData[]> => {
 }
 
 export const UpdateEquipo = async (id: number, data: Partial<EquiposData>): Promise<EquiposData> => {
-    const res = await api.patch<EquiposData>(`/usuario/${id}/`, data);
+    const res = await api.patch<EquiposData>(`/equipo/${id}/`, data);
     return res.data
 }
 //export const CreateEquipo = (data: Omit<EquiposData, "id">) => Equipos.post('/equipo/', data);
