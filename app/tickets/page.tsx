@@ -57,7 +57,7 @@ export default function TicketsPage() {
       ticket.tipo_servicio.toLowerCase().includes(lower) ||
       ticket.comentarios.toLowerCase().includes(lower) ||
       ticket.fk_reporta.toLowerCase().includes(lower) ||
-      (ticket.fk_tecnico?.toLowerCase().includes(lower) ?? false)
+      (ticket.fk_tecnico ?? false)
 
     const matchesStatus =
       statusFilter === "all" || ticket.estatus === statusFilter

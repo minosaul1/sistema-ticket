@@ -21,6 +21,7 @@ import { getEquipoId } from '@/api/Equipos.api'
 import toast from "react-hot-toast"
 import { useForm, Controller } from "react-hook-form";
 import { data } from "autoprefixer";
+import { useRouter } from "next/navigation"
 
 
 interface FormData {
@@ -41,6 +42,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
   const [equipoData, setEquipoData] = useState<EquiposData | null>(null)
   const { register, handleSubmit, control, formState: { errors }, reset, getValues } = useForm<FormData>()
   const [submitting, setSubmitting] = useState(false)
+  const router = useRouter()
 
 
   useEffect(() => {
@@ -78,6 +80,10 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
     };
     fetchTecnico();
   }, [])
+  //const te = setTecnico.find(item => item.id = ticketData?.fk_tecnico)
+  const tecnicoSeleccionado = tecnico.find(
+    item => item.id === ticketData?.fk_tecnico || item.id === ticketData?.fk_tecnico
+  )
 
   if (!ticketData || !equipoData) return (
     <div className="min-h-screen flex items-center justify-center text-gray-500">
@@ -108,14 +114,14 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
       const updateData: Partial<TiketsData> = {
         estatus: ticketData.estatus,
         comentarios: ticketData.comentarios,
-
         fk_tecnico: ticketData.fk_tecnico,
       };
       const updated = await UpdateTiket(ticketData.id, updateData);
       setTicketData(updated);
       setIsEditing(false);
-      console.log(ticketData.fk_tecnico),
-        toast.success("Estado actualizado correctamente");
+
+      toast.success("Estado actualizado correctamente");
+      router.push("/tickets");
     }
     catch (error) {
       toast.error("Error al actualizar el ticket...")
