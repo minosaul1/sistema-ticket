@@ -3,6 +3,7 @@ import './globals.css'
 import { Toaster } from "react-hot-toast";
 import ClientLayout from "@/components/layouts/ClientLayout"
 import { NavBar } from "@/components/layouts/NavBar";
+import NavbarWrapper from "@/components/layouts/NavbarWrapper"
 
 export const metadata: Metadata = {
   title: 'v0 App',
@@ -15,10 +16,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+
+
   return (
     <html lang="es">
       <body>
-        <NavBar />
+        <NavbarWrapper />
         <ClientLayout>{children}</ClientLayout>
         <Toaster
           position="top-center"

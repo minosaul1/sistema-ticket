@@ -16,3 +16,10 @@ export type CreatePayloadTicket = {
     comentarios: string;
     fk_equipo: number;
 }
+
+export type TicketStats = {
+    totalTickets: number;
+    ticketsAbiertos: number;
+    ticketsEnProceso: number;
+    ticketsResueltos: number;
+}
