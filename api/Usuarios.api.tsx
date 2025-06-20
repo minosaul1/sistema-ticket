@@ -1,7 +1,7 @@
-import api from '@/api/axiosConfig'
+import api from '@/lib/api';
+
+
 import { UserData, CreateUserPayload, TecnicoData } from '@/types/User.types'
-
-
 
 export const getAllUser = async (): Promise<UserData[]> => {
     const res = await api.get<UserData[]>('/usuario/');

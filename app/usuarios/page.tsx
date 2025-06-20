@@ -10,8 +10,12 @@ import { UsuarioList } from "@/components/Usuario/UsuarioList"
 import { UserData } from "@/types/User.types"
 import { getAllUser } from "@/api/Usuarios.api"
 import toast from "react-hot-toast"
+import { useAuth } from "@/hooks/useAuth"
+
 
 export default function UsuariosPage() {
+
+  const token = useAuth()
   const [usuarios, setUsuarios] = useState<UserData[]>([]);
   const [searchTerm, setSearchTerm] = useState("")
   const [rolFilter, setRolFilter] = useState<"all" | "admin" | "tecnico" | "usuario">("all");
@@ -36,7 +40,7 @@ export default function UsuariosPage() {
     const matchesSearch =
       usuario.user.first_name.toLowerCase().includes(term) ||
       usuario.user.email.toLowerCase().includes(term)
-    const matchesRol = rolFilter === "all" || usuario.role.toLowerCase() === rolFilter;
+    const matchesRol = rolFilter === "all" || usuario.role?.toLowerCase() === rolFilter;
     return matchesSearch && matchesRol
   })
 

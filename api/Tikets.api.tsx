@@ -1,4 +1,4 @@
-import api from './axiosConfig';
+import api from '@/lib/api';
 import { TiketsData, CreatePayloadTicket, TicketStats } from '../types/tikets.types'
 
 export const obtenerTickets = async (): Promise<TiketsData[]> => {

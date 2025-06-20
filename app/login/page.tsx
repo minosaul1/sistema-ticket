@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import axios from "axios"
+import api from "@/lib/api"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,17 @@ import {
 import { Ticket, Eye, EyeOff } from "lucide-react"
 import toast from "react-hot-toast"
 
+interface TokenResponse {
+  access: string
+  refresh: string
+  user: {
+    id: number
+    username: string
+    first_name: string
+    last_name: string
+    email: string
+  }
+}
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -25,28 +36,36 @@ export default function LoginPage() {
   })
   const router = useRouter()
 
-  interface TokenResponse {
-    access: string;
-    refresh: string;
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await axios.post<TokenResponse>("http://localhost:8000/api/token/", {
+      const response = await api.post<TokenResponse>("login/", {
         username: formData.username,
         password: formData.password,
+
       })
 
-      const { access, refresh } = response.data
+      const { access, refresh, user } = response.data
+
       localStorage.setItem("access_token", access)
       localStorage.setItem("refresh_token", refresh)
+      localStorage.setItem("user", JSON.stringify(response.data))
 
+      toast.success("Sesión iniciada correctamente")
       router.push("/dashboard")
-    } catch (error) {
-      console.error("Login failed", error)
+    } catch (error: any) {
+      {/**if (axios.isAxiosError(error) && error.response) {
+        const msg = error.response.data?.error || "Credenciales incorrectas"
+        toast.error(msg)
+      }
+      else {
+        toast.error("Error de red o del servidor")
+      }
+         */}
+      //console.error("Login failed", error)
       //alert("Credenciales incorrectas")
-      toast.error(" " + error)
+      toast.error("Error de credenciales")
+
     }
   }
 

@@ -12,10 +12,12 @@ import { Plus, Search, Filter, Edit } from "lucide-react"
 import { obtenerTickets } from '@/api/Tikets.api'
 import { TiketsData } from '@/types/tikets.types'
 import toast from "react-hot-toast"
+import { useAuth } from "@/hooks/useAuth"
 
 
 export default function TicketsPage() {
 
+  const token = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [Tikets, setTikets] = useState<TiketsData[]>([]);

@@ -11,8 +11,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
+import { useAuth } from "@/hooks/useAuth"
+
 
 export default function NuevoEquipoPage() {
+  const token = useAuth()
   const router = useRouter()
   const {
     register,

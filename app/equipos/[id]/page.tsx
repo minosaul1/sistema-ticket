@@ -12,7 +12,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Ticket, ArrowLeft, Edit, Save, Monitor, User, Calendar, Clock, Divide } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-
+import { useAuth } from "@/hooks/useAuth"
 import {
     Select,
     SelectTrigger,
@@ -26,6 +26,7 @@ type Props = {
 }
 
 export default function EquipoDetailPage({ params }: { params: Promise<{ id: number }> }) {
+    const token = useAuth()
     const { id } = use(params)
     const router = useRouter()
     const [equipoData, setEquipoData] = useState<EquiposData | null>(null)

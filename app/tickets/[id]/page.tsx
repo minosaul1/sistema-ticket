@@ -22,6 +22,7 @@ import toast from "react-hot-toast"
 import { useForm, Controller } from "react-hook-form";
 import { data } from "autoprefixer";
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
 
 
 interface FormData {
@@ -35,6 +36,8 @@ type Props = {
 };
 
 export default function TicketDetailPage({ params }: { params: Promise<{ id: number }> }) {
+
+  const token = useAuth()
   const { id } = use(params)
   const [isEditing, setIsEditing] = useState(false)
   const [ticketData, setTicketData] = useState<TiketsData | null>(null)

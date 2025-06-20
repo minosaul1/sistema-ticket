@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Monitor, Plus, Search, Filter, Eye, Edit } from "lucide-react"
 import { EquiposList } from "@/components/Equipo/EquiposList"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function EquiposPage() {
+  const token = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [tipoFilter, setTipoFilter] = useState("all")
 

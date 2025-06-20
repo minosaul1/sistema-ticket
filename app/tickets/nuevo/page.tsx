@@ -15,6 +15,8 @@ import { getEquiposSinReporte } from '@/api/Equipos.api'
 import { CreateTicket } from '@/api/Tikets.api'
 import toast from "react-hot-toast"
 import { EquiposData } from '@/types/EquipoTypes'
+import { useAuth } from "@/hooks/useAuth"
+
 interface FormData {
 
   servicio: string;
@@ -23,6 +25,8 @@ interface FormData {
 };
 
 export default function NuevoTicketPage() {
+
+  const token = useAuth()
   const router = useRouter()
   const { register, handleSubmit, control, formState: { errors }, reset } = useForm<FormData>()
   const [submitting, setSubmitting] = useState(false)

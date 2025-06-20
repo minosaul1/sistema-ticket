@@ -12,12 +12,16 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { User2, ArrowLeft, Edit, Save, Monitor, User, Calendar, Clock, Route } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+
 type Props = {
     user: UserData;
     setUser: (data: UserData) => void;
 };
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: number }> }) {
+
+    const token = useAuth()
     const router = useRouter()
     const { id } = use(params)
     const [userData, setUserData] = useState<UserData | null>(null)

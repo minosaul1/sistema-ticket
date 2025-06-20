@@ -1,4 +1,6 @@
-import api from '@/api/axiosConfig';
+//Dejamos de ocupar esto debido a que creamos las configuraciones en el otro archivo 
+// import api from '@/api/axiosConfig';
+import api from '@/lib/api';
 import { EquiposData } from '@/types/EquipoTypes'
 
 

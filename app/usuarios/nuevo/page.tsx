@@ -11,6 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertCircle } from "lucide-react"
 import { useForm, Controller } from "react-hook-form";
 import { createUser } from '@/api/Usuarios.api'
+import { useAuth } from "@/hooks/useAuth"
+
 
 interface FormData {
   first_name: string;
@@ -23,6 +25,8 @@ interface FormData {
 };
 
 export default function NuevoUsuarioPage() {
+
+  const token = useAuth()
   const router = useRouter()
   const { register, handleSubmit, control, formState: { errors }, reset } = useForm<FormData>();
   const [submitting, setSubmitting] = useState(false)

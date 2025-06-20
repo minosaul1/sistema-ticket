@@ -11,13 +11,11 @@ import { TiketsList } from "@/components/Tiket/TiketsList";
 import { useEffect, useState } from "react"
 import { getTicketStats } from "@/api/Tikets.api"
 import { TicketStats } from "@/types/tikets.types"
-import { data } from "autoprefixer"
-import { stat } from "fs"
-
-
+import { useAuth } from "@/hooks/useAuth"
 
 
 export default function DashboardPage() {
+  const token = useAuth()
   const router = useRouter()
   const [stats, setStats] = useState<TicketStats>({
     totalTickets: 0,
