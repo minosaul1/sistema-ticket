@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 
 
+
 interface FormData {
   tecnico: string;
 };
@@ -52,7 +53,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
     const fetchTicket = async () => {
       try {
         const data = await getTikect(id)
-        if (data.estatus.toLowerCase() === "cerrado") {
+        if (data.estatus.toLowerCase() === "cerrado" || data.estatus.toLowerCase() === "resuelto") {
           toast.error("No puedes reabrir ticket cerrado")
           return
         }
@@ -62,9 +63,9 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
         setTicketData(data)
         toast.success("Ticket cargado con éxito...")
       }
-      catch (error) {
-        //console.log(error)
-        toast.error("Error al cargar el Ticket...")
+      catch (err) {
+        router.push("/forbidden")
+
       }
 
     }

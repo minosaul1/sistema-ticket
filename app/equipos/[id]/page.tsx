@@ -31,6 +31,7 @@ export default function EquipoDetailPage({ params }: { params: Promise<{ id: num
     const router = useRouter()
     const [equipoData, setEquipoData] = useState<EquiposData | null>(null)
     const [isEditing, setIsEditing] = useState(false)
+    const [user, SetUser] = useState<{ role?: string }>({})
     const { register, handleSubmit, control, formState: { errors }, reset, getValues } = useForm<FormData>()
 
     useEffect(() => {
@@ -47,8 +48,24 @@ export default function EquipoDetailPage({ params }: { params: Promise<{ id: num
         }
         fetchEquiopo()
     }, [id])
+
+    useEffect(() => {
+        const userSrt = localStorage.getItem("user")
+        if (userSrt) {
+            const userData = JSON.parse(userSrt)
+            SetUser(userData)
+
+        }
+    }, [])
     if (!equipoData) {
         return <p className="p-4">Cargando equipo...</p>;
+    }
+    const handleEditClick = () => {
+
+        if (user.role !== 'admin' && user.role !== "tecnico") {
+            router.push('/forbidden')
+        }
+        setIsEditing(true)
     }
     const handleSave = async () => {
         try {
@@ -101,7 +118,7 @@ export default function EquipoDetailPage({ params }: { params: Promise<{ id: num
                                     Guardar
                                 </Button>
                             ) : (
-                                <Button onClick={() => setIsEditing(true)}>
+                                <Button onClick={handleEditClick}>
                                     <Edit className="h-4 w-4 mr-2" />
                                     Editar
                                 </Button>
