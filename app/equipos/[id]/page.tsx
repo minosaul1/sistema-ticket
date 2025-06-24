@@ -53,7 +53,7 @@ export default function EquipoDetailPage({ params }: { params: Promise<{ id: num
         const userSrt = localStorage.getItem("user")
         if (userSrt) {
             const userData = JSON.parse(userSrt)
-            SetUser(userData)
+            SetUser(userData.user)
 
         }
     }, [])
@@ -63,6 +63,7 @@ export default function EquipoDetailPage({ params }: { params: Promise<{ id: num
     const handleEditClick = () => {
 
         if (user.role !== 'admin' && user.role !== "tecnico") {
+            console.log(user.role)
             router.push('/forbidden')
         }
         setIsEditing(true)

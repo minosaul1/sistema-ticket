@@ -54,7 +54,8 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: num
       try {
         const data = await getTikect(id)
         if (data.estatus.toLowerCase() === "cerrado" || data.estatus.toLowerCase() === "resuelto") {
-          toast.error("No puedes reabrir ticket cerrado")
+          toast.error("No puedes reabrir ticket cerrado o Resuelto")
+          router.push('/tickets')
           return
         }
 
