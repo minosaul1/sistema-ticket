@@ -13,6 +13,8 @@ import { obtenerTickets } from '@/api/Tikets.api'
 import { TiketsData } from '@/types/tikets.types'
 import toast from "react-hot-toast"
 import { useAuth } from "@/hooks/useAuth"
+import ProtectedRoute from "@/components/ProtectedRoute"
+
 
 
 export default function TicketsPage() {
@@ -69,108 +71,110 @@ export default function TicketsPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <ProtectedRoute allowedRoles={["admin", "tecnico", "usuario"]}>
+      <div className="min-h-screen bg-gray-50">
 
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar tickets por usuario o tecnico..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Buscar tickets por usuario o tecnico..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filtrar por estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="Abierto">Abierto</SelectItem>
+                  <SelectItem value="En Proceso">En Proceso</SelectItem>
+                  <SelectItem value="Resuelto">Resuelto</SelectItem>
+                  <SelectItem value="Cerrado">Cerrado</SelectItem>
+                </SelectContent>
+              </Select>
+              <Link href="/tickets/nuevo">
+                <Button><Plus className="h-4 w-4 mr-2" />Nuevo Ticket</Button>
+              </Link>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filtrar por estado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="Abierto">Abierto</SelectItem>
-                <SelectItem value="En Proceso">En Proceso</SelectItem>
-                <SelectItem value="Resuelto">Resuelto</SelectItem>
-                <SelectItem value="Cerrado">Cerrado</SelectItem>
-              </SelectContent>
-            </Select>
-            <Link href="/tickets/nuevo">
-              <Button><Plus className="h-4 w-4 mr-2" />Nuevo Ticket</Button>
-            </Link>
-          </div>
-        </div>
 
-        {/* Tickets Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Lista de Tickets</CardTitle>
-            <CardDescription>{filteredTickets.length} tickets encontrados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Estatus</TableHead>
-                  <TableHead>Fecha Reporte</TableHead>
-                  <TableHead>Inicio Servicio</TableHead>
-                  <TableHead>Finalizó Servicio</TableHead>
-                  <TableHead>Servicio</TableHead>
-                  <TableHead>Comentarios</TableHead>
-                  <TableHead>Equipo</TableHead>
-                  <TableHead>Reportó</TableHead>
-                  <TableHead>Técnico</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTickets.map((ticket) => (
-                  <TableRow key={ticket.id}>
-                    <TableCell className="font-medium">#{ticket.id}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusColor(ticket.estatus)}>
-                        {ticket.estatus}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">{new Date(ticket.fecha_reporte).toLocaleString()}</TableCell>
-                    <TableCell className="text-sm">
-                      {ticket.fecha_inicio ? new Date(ticket.fecha_inicio).toLocaleString() : "—"}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {ticket.fecha_final ? new Date(ticket.fecha_final).toLocaleString() : "—"}
-                    </TableCell>
-                    <TableCell className="text-sm">{ticket.tipo_servicio}</TableCell>
-                    <TableCell className="text-sm">{ticket.comentarios}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{ticket.fk_equipo.id}</Badge>
-                      <Badge variant="outline">{ticket.fk_equipo.marca}</Badge>
-                      <Badge variant="outline">{ticket.fk_equipo.modelo}</Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">{ticket.fk_reporta}</TableCell>
-                    <TableCell className="text-sm">
-                      {ticket.fk_tecnico ? ticket.fk_tecnico : <span className="text-gray-500">Sin asignar</span>}
-                    </TableCell>
-
-
-                    <TableCell>
-                      <Link href={`/tickets/${ticket.id}`}>
-                        <Button variant="ghost" size="sm">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </Link>
-                    </TableCell>
+          {/* Tickets Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Lista de Tickets</CardTitle>
+              <CardDescription>{filteredTickets.length} tickets encontrados</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Estatus</TableHead>
+                    <TableHead>Fecha Reporte</TableHead>
+                    <TableHead>Inicio Servicio</TableHead>
+                    <TableHead>Finalizó Servicio</TableHead>
+                    <TableHead>Servicio</TableHead>
+                    <TableHead>Comentarios</TableHead>
+                    <TableHead>Equipo</TableHead>
+                    <TableHead>Reportó</TableHead>
+                    <TableHead>Técnico</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredTickets.map((ticket) => (
+                    <TableRow key={ticket.id}>
+                      <TableCell className="font-medium">#{ticket.id}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusColor(ticket.estatus)}>
+                          {ticket.estatus}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm">{new Date(ticket.fecha_reporte).toLocaleString()}</TableCell>
+                      <TableCell className="text-sm">
+                        {ticket.fecha_inicio ? new Date(ticket.fecha_inicio).toLocaleString() : "—"}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {ticket.fecha_final ? new Date(ticket.fecha_final).toLocaleString() : "—"}
+                      </TableCell>
+                      <TableCell className="text-sm">{ticket.tipo_servicio}</TableCell>
+                      <TableCell className="text-sm">{ticket.comentarios}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{ticket.fk_equipo.id}</Badge>
+                        <Badge variant="outline">{ticket.fk_equipo.marca}</Badge>
+                        <Badge variant="outline">{ticket.fk_equipo.modelo}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm">{ticket.fk_reporta}</TableCell>
+                      <TableCell className="text-sm">
+                        {ticket.fk_tecnico ? ticket.fk_tecnico : <span className="text-gray-500">Sin asignar</span>}
+                      </TableCell>
+
+
+                      <TableCell>
+                        <Link href={`/tickets/${ticket.id}`}>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }

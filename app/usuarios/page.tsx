@@ -11,6 +11,7 @@ import { UserData } from "@/types/User.types"
 import { getAllUser } from "@/api/Usuarios.api"
 import toast from "react-hot-toast"
 import { useAuth } from "@/hooks/useAuth"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 
 export default function UsuariosPage() {
@@ -45,47 +46,49 @@ export default function UsuariosPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <div className="min-h-screen bg-gray-50">
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Actions Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar usuarios..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Actions Bar */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Buscar usuarios..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={rolFilter} onValueChange={handleRolChange}>
+                <SelectTrigger className="w-40">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                  <SelectItem value="tecnico">Técnico</SelectItem>
+                  <SelectItem value="usuario">Usuario</SelectItem>
+                </SelectContent>
+              </Select>
+              <Link href="/usuarios/nuevo">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nuevo Usuario
+                </Button>
+              </Link>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Select value={rolFilter} onValueChange={handleRolChange}>
-              <SelectTrigger className="w-40">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="admin">Administrador</SelectItem>
-                <SelectItem value="tecnico">Técnico</SelectItem>
-                <SelectItem value="usuario">Usuario</SelectItem>
-              </SelectContent>
-            </Select>
-            <Link href="/usuarios/nuevo">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Usuario
-              </Button>
-            </Link>
-          </div>
-        </div>
 
-        {/* Usuarios Table */}
-        <UsuarioList usuarios={filteredUsuarios} />
+          {/* Usuarios Table */}
+          <UsuarioList usuarios={filteredUsuarios} />
 
-        <></>
-      </main>
-    </div>
+          <></>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }
