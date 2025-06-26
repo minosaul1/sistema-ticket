@@ -14,7 +14,7 @@ export const refreshToken = async (): Promise<string | null> => {
         localStorage.setItem("access", newAccess)
         return newAccess
     } catch (error) {
-        console.log("Error al refrescar el token: ", error)
+        //console.log("Error al refrescar el token: ", error)
         return null
     }
 }

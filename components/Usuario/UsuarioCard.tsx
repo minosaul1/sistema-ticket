@@ -1,4 +1,4 @@
-import { UserData } from '@/types/User.types'
+import { UserData, UserRole } from '@/types/User.types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, Phone, Eye, Edit } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -38,7 +38,7 @@ export function UsuarioCard({ user }: UserProps) {
                     <Phone className="h-4 w-4 text-gray-400" />
                     <span>{user.telephone}</span>
                 </div>
-                <Badge variant={getRolColor(user.role)}>{user.role}</Badge>
+                <Badge variant={getRolColor(user.role as UserRole)}>{user.role}</Badge>
                 <div className="text-sm">Equipos asignados: {user.equipos_asignados}</div>
                 <div className="text-sm">Tickets activos: {user.tickets_activos}</div>
             </CardContent>

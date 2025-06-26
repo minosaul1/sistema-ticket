@@ -7,13 +7,14 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { useEffect, useState } from "react";
 
 type Role = "admin" | "tecnico" | "usuario"
-type Section = "equipos" | "usuarios" | "tickets"
+type Section = "equipos" | "usuarios" | "tickets" | "complementos"
 
 const hasPermission = (role: Role | undefined, section: Section): boolean => {
     const accessMap: Record<Section, Role[]> = {
         equipos: ["admin", "tecnico"],
         usuarios: ["admin"],
         tickets: ["admin", "tecnico", "usuario"],
+        complementos: ["admin", "tecnico"],
     }
     return !!role && accessMap[section].includes(role)
 }
@@ -46,13 +47,17 @@ export function NavBar() {
                             </Link>
                         )
                         }
-
-
                         {hasPermission(user.role as Role, "equipos") && (
                             <Link href="/equipos">
                                 <Button variant="ghost">Equipos</Button>
                             </Link>
                         )
+                        }
+                        {hasPermission(user.role as Role, "complementos") &&
+                            <Link href="/complementos">
+                                <Button variant="ghost">Complementos </Button>
+                            </Link>
+
                         }
                         {hasPermission(user.role as Role, "usuarios") && (
                             <Link href="/usuarios">
