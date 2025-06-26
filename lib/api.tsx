@@ -5,7 +5,7 @@ import { logout } from "./auth/logout"
 
 //base de la ruta donde se realizan las peticiones
 const api = axios.create({
-    baseURL: "http://localhost:8000/control/",
+    baseURL: "http://localhost:8000/",
     headers: {
         "Content-Type": "application/json",
     },

@@ -26,8 +26,6 @@ import { useAuth } from "@/hooks/useAuth"
 import ProtectedRoute from "@/components/ProtectedRoute"
 
 
-
-
 interface FormData {
   tecnico: string;
 };

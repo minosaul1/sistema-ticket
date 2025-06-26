@@ -39,7 +39,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await api.post<TokenResponse>("login/", {
+      const response = await api.post<TokenResponse>("usuarios/login/", {
         username: formData.username,
         password: formData.password,
 
