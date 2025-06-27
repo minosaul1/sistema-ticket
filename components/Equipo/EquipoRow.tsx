@@ -11,6 +11,7 @@ type EquipoRowProps = {
 }
 
 export function EquipoRow({ equipo }: EquipoRowProps) {
+
   const getTipoColor = (tipo: string) => {
     switch (tipo) {
       case "Desktop":

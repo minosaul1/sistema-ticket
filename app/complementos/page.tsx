@@ -7,6 +7,7 @@ import { useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { ComplementoList } from "@/components/Complemento/ComplementoList"
 export default function ComplementosPage() {
     const token = useAuth()
     const [searchTerm, setSearchTerm] = useState("")
@@ -46,9 +47,8 @@ export default function ComplementosPage() {
                             </Link>
                         </div>
                     </div>
-
+                    <ComplementoList />
                 </main>
-
             </div >
         </ProtectedRoute >
     )
