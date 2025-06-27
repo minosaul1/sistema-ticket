@@ -6,3 +6,8 @@ export const getAllComplementos = async (): Promise<ComplementosData[]> => {
     return res.data
 
 }
+
+export const CreateComplemento = async (data: Omit<ComplementosData, "id">): Promise<ComplementosData> => {
+    const res = await api.post<ComplementosData>('equipo/complemento/', data)
+    return res.data
+}

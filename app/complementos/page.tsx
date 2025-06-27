@@ -39,7 +39,7 @@ export default function ComplementosPage() {
                                     <SelectItem value="Server">Server</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Link href="/equipos/nuevo">
+                            <Link href="/complementos/nuevo">
                                 <Button>
                                     <Plus className="h-4 w-4 mr-2" />
                                     Nuevo Componente
