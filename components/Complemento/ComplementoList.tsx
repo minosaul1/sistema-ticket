@@ -38,6 +38,7 @@ export function ComplementoList() {
                     <TableHead>Numero Serie</TableHead>
                     <TableHead>Ubicacion</TableHead>
                     <TableHead>Equipo</TableHead>
+                    <TableHead>Acciones</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

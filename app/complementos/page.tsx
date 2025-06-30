@@ -34,9 +34,9 @@ export default function ComplementosPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Todos</SelectItem>
-                                    <SelectItem value="Desktop">Desktop</SelectItem>
-                                    <SelectItem value="Laptop">Laptop</SelectItem>
-                                    <SelectItem value="Server">Server</SelectItem>
+                                    <SelectItem value="Desktop">Muase</SelectItem>
+                                    <SelectItem value="Laptop">Teclado</SelectItem>
+                                    <SelectItem value="Server">Bocina</SelectItem>
                                 </SelectContent>
                             </Select>
                             <Link href="/complementos/nuevo">
